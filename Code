@@ -1,0 +1,189 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
+class Course {
+    private String code;
+    private String name;
+    private int creditHours;
+
+    public Course(String code, String name, int creditHours) {
+        this.code = code;
+        this.name = name;
+        this.creditHours = creditHours;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getCreditHours() {
+        return creditHours;
+    }
+}
+
+class Student {
+    private String name;
+    private int id;
+    private List<Course> courses;
+
+    public Student(String name, int id) {
+        this.name = name;
+        this.id = id;
+        this.courses = new ArrayList<>();
+    }
+
+    public void addCourse(Course course) {
+        courses.add(course);
+        JOptionPane.showMessageDialog(null, "Course " + course.getCode() + " added successfully.");
+    }
+
+    public void dropCourse(Course course) {
+        courses.remove(course);
+        JOptionPane.showMessageDialog(null, "Course " + course.getCode() + " dropped successfully.");
+    }
+
+    public void viewCourses() {
+        StringBuilder coursesList = new StringBuilder("Registered Courses:\n");
+        for (Course course : courses) {
+            coursesList.append(course.getCode()).append(" - ").append(course.getName()).append("\n");
+        }
+        JOptionPane.showMessageDialog(null, coursesList.toString());
+    }
+
+    public double calculateGPA() {
+        double totalGradePoints = 0;
+        int totalCreditHours = 0;
+
+        for (Course course : courses) {
+            String grade = JOptionPane.showInputDialog(null, "Enter grade for " + course.getCode());
+            if (grade == null) {
+                // User canceled input, return 0.0
+                return 0.0;
+            }
+
+            // Convert grade to grade points
+            double gradePoints;
+            switch (grade.toUpperCase()) {
+                case "A":
+                    gradePoints = 4.0;
+                    break;
+                case "B":
+                    gradePoints = 3.0;
+                    break;
+                case "C":
+                    gradePoints = 2.0;
+                    break;
+                case "D":
+                    gradePoints = 1.0;
+                    break;
+                case "F":
+                    gradePoints = 0.0;
+                    break;
+                default:
+                    gradePoints = 0.0;
+                    break;
+            }
+
+            totalGradePoints += (gradePoints * course.getCreditHours());
+            totalCreditHours += course.getCreditHours();
+        }
+
+        return totalGradePoints / totalCreditHours;
+    }
+}
+
+public class StudentManagementSystem {
+    private JFrame frame;
+    private JTextField nameTextField;
+    private JTextField idTextField;
+    private Student student;
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                StudentManagementSystem window = new StudentManagementSystem();
+                window.frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public StudentManagementSystem() {
+        initialize();
+    }
+
+    private void initialize() {
+        frame = new JFrame();
+        frame.setTitle("Student Management System");
+        frame.setBounds(100, 100, 450, 300);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(null);
+
+        JLabel nameLabel = new JLabel("Name:");
+        nameLabel.setBounds(50, 50, 50, 20);
+        frame.getContentPane().add(nameLabel);
+
+        nameTextField = new JTextField();
+        nameTextField.setBounds(100, 50, 150, 20);
+        frame.getContentPane().add(nameTextField);
+        nameTextField.setColumns(10);
+
+        JLabel idLabel = new JLabel("ID:");
+        idLabel.setBounds(50, 80, 50, 20);
+        frame.getContentPane().add(idLabel);
+
+        idTextField = new JTextField();
+        idTextField.setBounds(100, 80, 150, 20);
+        frame.getContentPane().add(idTextField);
+        idTextField.setColumns(10);
+
+        JButton registerButton = new JButton("Register");
+        registerButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String name = nameTextField.getText();
+                int id = Integer.parseInt(idTextField.getText());
+                student = new Student(name, id);
+
+                Course c1 = new Course("CS101", "Introduction to Programming", 3);
+                Course c2 = new Course("CS201", "Data Structures", 4);
+                Course c3 = new Course("CS301", "Algorithms", 3);
+
+                student.addCourse(c1);
+                student.addCourse(c2);
+                student.addCourse(c3);
+
+                JOptionPane.showMessageDialog(null, "Student registered successfully.");
+            }
+        });
+        registerButton.setBounds(100, 120, 100, 23);
+        frame.getContentPane().add(registerButton);
+
+        JButton viewCoursesButton = new JButton("View Courses");
+        viewCoursesButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                student.viewCourses();
+            }
+        });
+        viewCoursesButton.setBounds(210, 120, 120, 23);
+        frame.getContentPane().add(viewCoursesButton);
+
+        JButton calculateGPAButton = new JButton("Calculate GPA");
+        calculateGPAButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                double gpa = student.calculateGPA();
+                JOptionPane.showMessageDialog(null, "GPA: " + gpa);
+            }
+        });
+        calculateGPAButton.setBounds(150, 160, 120, 23);
+        frame.getContentPane().add(calculateGPAButton);
+    }
+}
